@@ -315,15 +315,7 @@ def saveOrGetTextureDefinition(
     images: list[bpy.types.Image],
     isLarge: bool,
 ) -> tuple[FImageKey, FImage]:
-    restore_tex_reference = False
-    if is_hm64() and texProp and texProp.use_tex_reference and texProp.tex is not None:
-        restore_tex_reference = True
-        texProp.use_tex_reference = False
-    try:
-        imageKey, fImage = _ORIGINALS["saveOrGetTextureDefinition"](fMaterial, parent, texProp, images, isLarge)
-    finally:
-        if restore_tex_reference:
-            texProp.use_tex_reference = True
+    imageKey, fImage = _ORIGINALS["saveOrGetTextureDefinition"](fMaterial, parent, texProp, images, isLarge)
     if not is_hm64():
         return imageKey, fImage
     if texProp and getattr(texProp, "texture_internal_path", ""):
@@ -353,7 +345,7 @@ def fromProp(self, texProp: TextureProperty, index: int, ignore_tex_set=False) -
 
     self.useTex = True
     tex = texProp.tex
-    self.isTexRef = texProp.use_tex_reference and tex is None
+    self.isTexRef = texProp.use_tex_reference
     self.texFormat = texProp.tex_format
     self.isTexCI = self.texFormat[:2] == "CI"
     self.palFormat = texProp.ci_format if self.isTexCI else ""
