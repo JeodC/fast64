@@ -354,6 +354,15 @@ def export_bk64_animation(context, armature_obj, settings):
     to_bk = _to_bk(settings.scale)
     bones, _index_of_name = build_bone_table(armature_obj, to_bk)
 
+    uninherited = [bone.name for bone in armature_obj.data.bones if bone.inherit_scale != "FULL"]
+    if uninherited:
+        listed = ", ".join(uninherited[:3]) + (" and others" if len(uninherited) > 3 else "")
+        counted = "1 bone has" if len(uninherited) == 1 else f"{len(uninherited)} bones have"
+        settings.warnings.append(
+            f"{counted} Inherit Scale set to something other than Full ({listed}). The game composes "
+            "bone transforms down the table, so those bones still scale with their parents in game."
+        )
+
     # frame numbers are the animation's own, and the game divides by end - start
     frames = list(range(1, last - first + 2))
     previous = [mathutils.Euler((0.0, 0.0, 0.0), "XYZ") for _bone in bones]
